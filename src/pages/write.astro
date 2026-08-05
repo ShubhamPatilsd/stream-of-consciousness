@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+	title="Write · Shubham's Thoughts"
+	description="Write a new thought."
+	noindex
+>
+	<header class="site-header">
+		<a href="/" class="site-title">Shubham's Thoughts</a>
+	</header>
+
+	<section class="writer" aria-labelledby="writer-title">
+		<h1 id="writer-title">New thought</h1>
+
+		<form id="thought-form">
+			<label for="thought">Thought</label>
+			<textarea
+				id="thought"
+				name="thought"
+				rows="8"
+				maxlength="10000"
+				required
+				autofocus
+			></textarea>
+
+			<div class="writer-token" id="token-field">
+				<label for="publish-token">Publishing key</label>
+				<input
+					id="publish-token"
+					name="publish-token"
+					type="password"
+					autocomplete="current-password"
+				/>
+			</div>
+
+			<div class="writer-actions">
+				<button type="submit" id="publish-button">Publish</button>
+				<button type="button" id="forget-token" hidden>Forget key</button>
+			</div>
+
+			<p class="writer-status" id="writer-status" role="status" aria-live="polite"></p>
+		</form>
+	</section>
+</BaseLayout>
+
+<script>
+	const TOKEN_STORAGE_KEY = 'thoughts.publishToken';
+
+	function requireElement<T extends Element>(selector: string): T {
+		const element = document.querySelector<T>(selector);
+		if (!element) {
+			throw new Error(`Writer element not found: ${selector}`);
+		}
+		return element;
+	}
+
+	const form = requireElement<HTMLFormElement>('#thought-form');
+	const thought = requireElement<HTMLTextAreaElement>('#thought');
+	const token = requireElement<HTMLInputElement>('#publish-token');
+	const tokenField = requireElement<HTMLElement>('#token-field');
+	const publishButton =
+		requireElement<HTMLButtonElement>('#publish-button');
+	const forgetButton = requireElement<HTMLButtonElement>('#forget-token');
+	const status = requireElement<HTMLElement>('#writer-status');
+
+	function readSavedToken() {
+		return window.localStorage.getItem(TOKEN_STORAGE_KEY) ?? '';
+	}
+
+	function showTokenState(hasSavedToken: boolean) {
+		tokenField.hidden = hasSavedToken;
+		forgetButton.hidden = !hasSavedToken;
+		token.required = !hasSavedToken;
+	}
+
+	showTokenState(Boolean(readSavedToken()));
+
+	forgetButton.addEventListener('click', () => {
+		window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+		token.value = '';
+		showTokenState(false);
+		token.focus();
+	});
+
+	form.addEventListener('submit', async (event) => {
+		event.preventDefault();
+
+		const publishToken = readSavedToken() || token.value;
+		if (!publishToken) {
+			showTokenState(false);
+			token.focus();
+			return;
+		}
+
+		publishButton.disabled = true;
+		status.textContent = 'Publishing…';
+
+		try {
+			const response = await fetch('/api/thoughts', {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${publishToken}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					text: thought.value,
+					source: 'text',
+				}),
+			});
+			const result = (await response.json()) as {
+				error?: string;
+			};
+
+			if (!response.ok) {
+				if (response.status === 401) {
+					window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+					showTokenState(false);
+				}
+				throw new Error(result.error || 'The thought could not be published.');
+			}
+
+			window.localStorage.setItem(TOKEN_STORAGE_KEY, publishToken);
+			token.value = '';
+			showTokenState(true);
+			thought.value = '';
+			status.textContent = 'Published. It will appear after the next deployment.';
+			thought.focus();
+		} catch (error) {
+			status.textContent =
+				error instanceof Error ? error.message : 'The thought could not be published.';
+		} finally {
+			publishButton.disabled = false;
+		}
+	});
+</script>

@@ -1,0 +1,17 @@
+---
+import ThoughtFeed from '../components/ThoughtFeed.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {
+	getPageCount,
+	getSortedThoughts,
+	paginateThoughts,
+} from '../lib/thoughts';
+
+const allThoughts = await getSortedThoughts();
+const pageCount = getPageCount(allThoughts.length);
+const thoughts = paginateThoughts(allThoughts, 1);
+---
+
+<BaseLayout>
+	<ThoughtFeed thoughts={thoughts} page={1} pageCount={pageCount} />
+</BaseLayout>

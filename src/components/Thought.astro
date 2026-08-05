@@ -1,0 +1,26 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+
+interface Props {
+	thought: CollectionEntry<'thoughts'>;
+}
+
+const { thought } = Astro.props;
+const { Content } = await render(thought);
+const machineDate = thought.data.publishedAt.toISOString();
+const readableDate = new Intl.DateTimeFormat('en-US', {
+	dateStyle: 'long',
+	timeStyle: 'short',
+	timeZone: 'America/Los_Angeles',
+}).format(thought.data.publishedAt);
+---
+
+<li class="thought-item">
+	<article class="thought">
+		{thought.data.title && <h2>{thought.data.title}</h2>}
+		<div class="thought-body">
+			<Content />
+		</div>
+		<time datetime={machineDate}>{readableDate}</time>
+	</article>
+</li>

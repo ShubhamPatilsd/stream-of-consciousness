@@ -1,0 +1,34 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ThoughtFeed from '../../components/ThoughtFeed.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+	getPageCount,
+	getSortedThoughts,
+	paginateThoughts,
+} from '../../lib/thoughts';
+
+export const getStaticPaths = (async () => {
+	const thoughts = await getSortedThoughts();
+	const pageCount = getPageCount(thoughts.length);
+
+	return Array.from({ length: Math.max(0, pageCount - 1) }, (_, index) => {
+		const page = index + 2;
+
+		return {
+			params: { page: String(page) },
+			props: {
+				page,
+				pageCount,
+				thoughts: paginateThoughts(thoughts, page),
+			},
+		};
+	});
+}) satisfies GetStaticPaths;
+
+const { page, pageCount, thoughts } = Astro.props;
+---
+
+<BaseLayout title={`Page ${page} · Shubham's Thoughts`}>
+	<ThoughtFeed thoughts={thoughts} page={page} pageCount={pageCount} />
+</BaseLayout>

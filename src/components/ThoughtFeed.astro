@@ -1,0 +1,43 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Thought from './Thought.astro';
+
+interface Props {
+	thoughts: CollectionEntry<'thoughts'>[];
+	page: number;
+	pageCount: number;
+}
+
+const { thoughts, page, pageCount } = Astro.props;
+const newerHref = page === 2 ? '/' : `/page/${page - 1}/`;
+const olderHref = `/page/${page + 1}/`;
+---
+
+<header class="site-header">
+	<a href="/" class="site-title">Shubham's Thoughts</a>
+</header>
+
+<figure class="watercolor">
+	<img
+		src="/watercolor.jpg"
+		alt="First Abstract Watercolor by Wassily Kandinsky"
+		width="1024"
+		height="784"
+	/>
+</figure>
+
+<ol class="thought-list" aria-label="Thoughts">
+	{thoughts.map((thought) => <Thought thought={thought} />)}
+</ol>
+
+{
+	pageCount > 1 && (
+		<nav class="pagination" aria-label="Thought pages">
+			{page > 1 ? <a href={newerHref}>Newer</a> : <span />}
+			<span aria-current="page">
+				{page} of {pageCount}
+			</span>
+			{page < pageCount ? <a href={olderHref}>Older</a> : <span />}
+		</nav>
+	)
+}
