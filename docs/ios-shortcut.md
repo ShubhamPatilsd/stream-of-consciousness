@@ -12,8 +12,10 @@ actions in order:
 
 1. **Dictate Text**
    - Language: your preferred language
-   - Stop Listening: **After Pause** for hands-free capture, or **On Tap** if
-     your thoughts often contain long pauses
+   - Stop Listening: **After Long Pause**. The default, **After Pause**, ends
+     the recording during ordinary mid-sentence thinking and publishes the
+     fragment. Choose **On Tap** instead if even a long pause clips you — it is
+     the only setting that cannot truncate a thought, at the cost of one tap.
 2. **URL**
    - `https://YOUR_DOMAIN/api/thoughts`
 3. **Get Contents of URL**
@@ -54,5 +56,9 @@ On a supported iPhone:
 3. Choose **Publish thought**.
 
 Press and hold the Action Button to launch the shortcut, then speak. Dictation
-stops after a pause (or when tapped, depending on the option selected above),
-publishes automatically, and shows the confirmation notification.
+stops after a long pause (or when tapped, depending on the option selected
+above), publishes automatically, and shows the confirmation notification.
+
+If thoughts keep getting cut off mid-sentence, that is the **Stop Listening**
+setting, not the network or the endpoint: the shortcut sends whatever Dictation
+had captured when it decided you were finished.
