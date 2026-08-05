@@ -43,7 +43,7 @@ main {
 
 /* Site title: present, but quiet. */
 .site-header {
-	margin-block-end: clamp(5rem, 14vh, 7rem);
+	margin-block-end: clamp(2.5rem, 7vh, 3.5rem);
 }
 
 .site-title {
@@ -77,7 +77,7 @@ main {
 
 @media (min-width: 64rem) {
 	.site-header {
-		margin-block-end: clamp(3rem, 8vh, 5rem);
+		margin-block-end: clamp(2rem, 5vh, 3rem);
 	}
 
 	.watercolor {
@@ -97,7 +97,7 @@ main {
 }
 
 .thought-item + .thought-item {
-	margin-block-start: clamp(3.5rem, 9vh, 5.5rem);
+	margin-block-start: clamp(2rem, 5vh, 3rem);
 }
 
 .thought h2 {
