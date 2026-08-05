@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { hasValidPublishToken } from '../../lib/publishing/auth';
 import { appendGitHubLine } from '../../lib/publishing/github';
 import { prepareThought } from '../../lib/publishing/prepare';
+import { purgeFeedCache } from '../../lib/feed-cache';
 import {
 	InvalidPublishRequestError,
 	parsePublishRequest,
@@ -63,10 +64,15 @@ export const POST: APIRoute = async ({ request }) => {
 			token: githubToken,
 		});
 
+		// The thought is committed either way; a failed purge only means the
+		// cached feed lags, so say so instead of reporting a clean publish.
+		const purged = await purgeFeedCache();
+
 		return json(
 			{
 				ok: true,
 				cleaned: result.cleaned,
+				purged,
 				path,
 				commitUrl,
 			},
