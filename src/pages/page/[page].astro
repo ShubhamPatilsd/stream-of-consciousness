@@ -1,32 +1,32 @@
 ---
-import type { GetStaticPaths } from 'astro';
 import ThoughtFeed from '../../components/ThoughtFeed.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { FEED_CACHE_CONTROL } from '../../lib/feed-cache';
 import {
 	getPageCount,
 	getSortedThoughts,
 	paginateThoughts,
 } from '../../lib/thoughts';
 
-export const getStaticPaths = (async () => {
-	const thoughts = await getSortedThoughts();
-	const pageCount = getPageCount(thoughts.length);
+export const prerender = false;
 
-	return Array.from({ length: Math.max(0, pageCount - 1) }, (_, index) => {
-		const page = index + 2;
+const page = Number(Astro.params.page);
 
-		return {
-			params: { page: String(page) },
-			props: {
-				page,
-				pageCount,
-				thoughts: paginateThoughts(thoughts, page),
-			},
-		};
-	});
-}) satisfies GetStaticPaths;
+// Page 1 lives at `/`, so anything below 2 or non-numeric is not a real page.
+if (!Number.isInteger(page) || page < 2) {
+	return new Response('Not found', { status: 404 });
+}
 
-const { page, pageCount, thoughts } = Astro.props;
+const allThoughts = await getSortedThoughts();
+const pageCount = getPageCount(allThoughts.length);
+
+if (page > pageCount) {
+	return new Response('Not found', { status: 404 });
+}
+
+Astro.response.headers.set('Cache-Control', FEED_CACHE_CONTROL);
+
+const thoughts = paginateThoughts(allThoughts, page);
 ---
 
 <BaseLayout title={`Page ${page} · Shubham's Thoughts`}>

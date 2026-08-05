@@ -1,15 +1,13 @@
 import type { APIRoute } from 'astro';
 import { hasValidPublishToken } from '../../lib/publishing/auth';
-import { createGitHubFile } from '../../lib/publishing/github';
-import {
-	createThoughtPath,
-	serializeThought,
-} from '../../lib/publishing/markdown';
+import { appendGitHubLine } from '../../lib/publishing/github';
 import { prepareThought } from '../../lib/publishing/prepare';
 import {
 	InvalidPublishRequestError,
 	parsePublishRequest,
 } from '../../lib/publishing/validation';
+import { monthFilePath, serializeThought } from '../../lib/thought-record';
+import { forgetCachedThoughts } from '../../lib/thoughts';
 
 export const prerender = false;
 
@@ -51,14 +49,22 @@ export const POST: APIRoute = async ({ request }) => {
 	});
 
 	const publishedAt = new Date();
-	const path = createThoughtPath(publishedAt);
+	const path = monthFilePath(publishedAt);
+	const line = serializeThought({
+		id: crypto.randomUUID(),
+		publishedAt,
+		source: input.source,
+		text: result.text,
+	});
 
 	try {
-		const { commitUrl } = await createGitHubFile({
+		const { commitUrl } = await appendGitHubLine({
 			path,
-			content: serializeThought(result.text, publishedAt),
+			line,
 			token: githubToken,
 		});
+
+		forgetCachedThoughts();
 
 		return json(
 			{

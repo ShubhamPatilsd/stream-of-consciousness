@@ -1,25 +1,42 @@
 ---
-import { render, type CollectionEntry } from 'astro:content';
+import type { ThoughtRecord } from '../lib/thought-record';
 
 interface Props {
-	thought: CollectionEntry<'thoughts'>;
+	thought: ThoughtRecord;
 }
 
 const { thought } = Astro.props;
-const { Content } = await render(thought);
-const machineDate = thought.data.publishedAt.toISOString();
+const paragraphs = thought.text
+	.split(/\n{2,}/)
+	.map((paragraph) => paragraph.trim())
+	.filter(Boolean);
+const machineDate = thought.publishedAt.toISOString();
 const readableDate = new Intl.DateTimeFormat('en-US', {
 	dateStyle: 'long',
 	timeStyle: 'short',
 	timeZone: 'America/Los_Angeles',
-}).format(thought.data.publishedAt);
+}).format(thought.publishedAt);
 ---
 
 <li class="thought-item">
 	<article class="thought">
-		{thought.data.title && <h2>{thought.data.title}</h2>}
 		<div class="thought-body">
-			<Content />
+			{
+				paragraphs.map((paragraph) => (
+					<p>
+						{paragraph.split('\n').map((line, index) =>
+							index === 0 ? (
+								line
+							) : (
+								<>
+									<br />
+									{line}
+								</>
+							),
+						)}
+					</p>
+				))
+			}
 		</div>
 		<time datetime={machineDate}>{readableDate}</time>
 	</article>

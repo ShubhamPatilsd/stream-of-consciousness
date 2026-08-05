@@ -29,8 +29,8 @@ actions in order:
    - Text: `Thought published`
 
 Run it once inside Shortcuts to grant microphone, dictation, and network
-permissions. A successful capture appears on the public site after Vercel
-finishes the rebuild triggered by the new Markdown commit.
+permissions. A successful capture is live as soon as the notification appears,
+though the feed's 60-second edge cache may delay it by up to a minute.
 
 Treat the publishing token like a password. If the phone is lost or the
 shortcut is shared accidentally, replace `PUBLISH_TOKEN` in Vercel and update

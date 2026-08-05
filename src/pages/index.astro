@@ -1,11 +1,16 @@
 ---
 import ThoughtFeed from '../components/ThoughtFeed.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { FEED_CACHE_CONTROL } from '../lib/feed-cache';
 import {
 	getPageCount,
 	getSortedThoughts,
 	paginateThoughts,
 } from '../lib/thoughts';
+
+export const prerender = false;
+
+Astro.response.headers.set('Cache-Control', FEED_CACHE_CONTROL);
 
 const allThoughts = await getSortedThoughts();
 const pageCount = getPageCount(allThoughts.length);

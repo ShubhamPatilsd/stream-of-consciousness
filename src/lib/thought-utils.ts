@@ -1,14 +1,12 @@
 export const THOUGHTS_PER_PAGE = 50;
 
 type DatedEntry = {
-	data: {
-		publishedAt: Date;
-	};
+	publishedAt: Date;
 };
 
 export function sortThoughtsNewestFirst<T extends DatedEntry>(thoughts: T[]): T[] {
 	return [...thoughts].sort(
-		(a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime(),
+		(a, b) => b.publishedAt.getTime() - a.publishedAt.getTime(),
 	);
 }
 

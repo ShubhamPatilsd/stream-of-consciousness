@@ -6,7 +6,7 @@ import {
 } from './thought-utils';
 
 function thought(publishedAt: string) {
-	return { data: { publishedAt: new Date(publishedAt) } };
+	return { publishedAt: new Date(publishedAt) };
 }
 
 describe('thought feed helpers', () => {

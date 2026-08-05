@@ -1,9 +1,9 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { ThoughtRecord } from '../lib/thought-record';
 import Thought from './Thought.astro';
 
 interface Props {
-	thoughts: CollectionEntry<'thoughts'>[];
+	thoughts: ThoughtRecord[];
 	page: number;
 	pageCount: number;
 }
