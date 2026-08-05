@@ -7,7 +7,6 @@ import {
 	parsePublishRequest,
 } from '../../lib/publishing/validation';
 import { monthFilePath, serializeThought } from '../../lib/thought-record';
-import { forgetCachedThoughts } from '../../lib/thoughts';
 
 export const prerender = false;
 
@@ -63,8 +62,6 @@ export const POST: APIRoute = async ({ request }) => {
 			line,
 			token: githubToken,
 		});
-
-		forgetCachedThoughts();
 
 		return json(
 			{

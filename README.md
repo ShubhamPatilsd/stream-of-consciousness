@@ -15,8 +15,9 @@ per month:
 
 The repository is the database. Publishing appends a line and commits it; the
 site reads those files from GitHub at request time, so a new thought is live as
-soon as the commit lands — no rebuild. Feed pages are cached at Vercel's edge
-for 60 seconds, so readers are not waiting on GitHub.
+soon as the commit lands — no rebuild, and no cache to wait out. Feed pages send
+`Cache-Control: no-store` deliberately: a shared cache would make a just-published
+thought invisible for the length of its lifetime.
 
 Thought text is stored raw and escaped at render time. It is displayed as plain
 text with paragraph breaks, not Markdown.
@@ -63,7 +64,8 @@ as a Home Screen icon and assign it to the iPhone Action Button.
 ## Deployment
 
 Connect this repository to Vercel. The feed pages and `POST /api/thoughts` both
-run as Vercel Functions; the feed is served from the edge cache between reads.
+run as Vercel Functions. Rendering a feed page costs two GitHub API calls, which
+is far inside the 5,000/hour authenticated rate limit at personal-site traffic.
 There is no database — see "How thoughts are stored".
 
 `GITHUB_TOKEN` is required for the site to render, not just to publish: without

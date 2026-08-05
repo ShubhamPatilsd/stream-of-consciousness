@@ -13,12 +13,6 @@ export {
 	THOUGHTS_PER_PAGE,
 } from './thought-utils';
 
-/** Short in-instance memo so rendering a page does not refetch every month
- * file per request. The edge cache absorbs the rest. */
-const MEMO_TTL_MS = 30_000;
-
-let memo: { thoughts: ThoughtRecord[]; expiresAt: number } | null = null;
-
 async function readMonthFilesFromDisk(): Promise<string[]> {
 	const { readdir, readFile } = await import('node:fs/promises');
 	const { join } = await import('node:path');
@@ -50,26 +44,17 @@ async function readMonthFilesFromGitHub(token: string): Promise<string[]> {
 }
 
 /**
- * Reads from GitHub at request time so a publish goes live without a rebuild.
+ * Reads from GitHub on every request so a publish is visible immediately.
+ * Nothing is memoized: a cache here would live in one serverless instance
+ * while the publish that should invalidate it runs in another.
+ *
  * Without a token — local development — it falls back to the working copy.
  */
 export async function getSortedThoughts(): Promise<ThoughtRecord[]> {
-	if (memo && memo.expiresAt > Date.now()) {
-		return memo.thoughts;
-	}
-
 	const token = process.env.GITHUB_TOKEN ?? '';
 	const files = token
 		? await readMonthFilesFromGitHub(token)
 		: await readMonthFilesFromDisk();
 
-	const thoughts = sortThoughtsNewestFirst(files.flatMap(parseThoughtFile));
-	memo = { thoughts, expiresAt: Date.now() + MEMO_TTL_MS };
-
-	return thoughts;
-}
-
-/** Drops the memo so a just-published thought is visible immediately. */
-export function forgetCachedThoughts(): void {
-	memo = null;
+	return sortThoughtsNewestFirst(files.flatMap(parseThoughtFile));
 }

@@ -1,7 +1,7 @@
 /**
- * Feed pages are rendered per request but served from Vercel's edge cache, so
- * a reader almost never waits on GitHub. `stale-while-revalidate` keeps the
- * last good page up if GitHub is slow or briefly unavailable.
+ * Feed pages are not cached: a thought published from the phone has to be
+ * visible on the next refresh, and any shared cache makes that a lie for up to
+ * its lifetime. Each render costs two GitHub API calls instead, which is well
+ * inside the authenticated rate limit for a personal site.
  */
-export const FEED_CACHE_CONTROL =
-	'public, s-maxage=60, stale-while-revalidate=86400';
+export const FEED_CACHE_CONTROL = 'no-store';
