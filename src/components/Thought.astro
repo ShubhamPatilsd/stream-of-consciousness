@@ -1,11 +1,13 @@
 ---
 import type { ThoughtRecord } from '../lib/thought-record';
+import type { VoteCounts } from '../lib/votes';
 
 interface Props {
 	thought: ThoughtRecord;
+	votes?: VoteCounts;
 }
 
-const { thought } = Astro.props;
+const { thought, votes = { up: 0, down: 0 } } = Astro.props;
 const paragraphs = thought.text
 	.split(/\n{2,}/)
 	.map((paragraph) => paragraph.trim())
@@ -39,5 +41,14 @@ const readableDate = new Intl.DateTimeFormat('en-US', {
 			}
 		</div>
 		<time datetime={machineDate}>{readableDate}</time>
+		<form method="post" action="/api/vote" class="vote-form">
+			<input type="hidden" name="thoughtId" value={thought.id} />
+			<button type="submit" name="vote" value="up" aria-label="Upvote">
+				▲ {votes.up}
+			</button>
+			<button type="submit" name="vote" value="down" aria-label="Downvote">
+				▼ {votes.down}
+			</button>
+		</form>
 	</article>
 </li>

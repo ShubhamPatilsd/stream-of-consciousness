@@ -118,11 +118,13 @@ export async function appendGitHubLine({
 	path,
 	line,
 	token,
+	message = 'publish thought',
 	fetch: fetchImpl = globalThis.fetch,
 }: {
 	path: string;
 	line: string;
 	token: string;
+	message?: string;
 	fetch?: Fetch;
 }): Promise<{ commitUrl?: string }> {
 	for (let attempt = 1; attempt <= APPEND_ATTEMPTS; attempt += 1) {
@@ -135,7 +137,7 @@ export async function appendGitHubLine({
 			method: 'PUT',
 			headers: headers(token),
 			body: JSON.stringify({
-				message: 'publish thought',
+				message,
 				content: Buffer.from(content, 'utf8').toString('base64'),
 				branch: GITHUB_BRANCH,
 				...(existing ? { sha: existing.sha } : {}),
