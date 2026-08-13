@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+	hasValidPublishSession,
+	PUBLISH_SESSION_COOKIE,
+} from '../../lib/publishing/auth';
+
+export const prerender = false;
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+const publishToken = process.env.PUBLISH_TOKEN ?? '';
+const session = Astro.cookies.get(PUBLISH_SESSION_COOKIE)?.value;
+
+if (hasValidPublishSession(session, publishToken)) {
+	return Astro.redirect('/write');
+}
+
+const invalid = Astro.url.searchParams.get('error') === 'invalid';
+---
+
+<BaseLayout
+	title="Sign in · Shubham's Thoughts"
+	description="Sign in to publish a thought."
+	noindex
+>
+	<header class="site-header">
+		<a href="/" class="site-title">Shubham's Thoughts</a>
+	</header>
+
+	<section class="writer" aria-labelledby="writer-title">
+		<h1 id="writer-title">Sign in to write</h1>
+
+		<form method="post" action="/api/publish-session">
+			<label for="publish-token">Publishing key</label>
+			<input
+				id="publish-token"
+				name="publish-token"
+				type="password"
+				autocomplete="current-password"
+				required
+				autofocus
+			/>
+
+			<div class="writer-actions">
+				<button type="submit">Sign in</button>
+			</div>
+
+			<p class="writer-status" role="status" aria-live="polite">
+				{invalid ? 'That publishing key is not valid.' : ''}
+			</p>
+		</form>
+	</section>
+</BaseLayout>

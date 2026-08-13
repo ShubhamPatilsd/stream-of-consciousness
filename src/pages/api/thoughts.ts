@@ -1,5 +1,9 @@
 import type { APIRoute } from 'astro';
-import { hasValidPublishToken } from '../../lib/publishing/auth';
+import {
+	hasValidPublishSession,
+	hasValidPublishToken,
+	PUBLISH_SESSION_COOKIE,
+} from '../../lib/publishing/auth';
 import { appendGitHubLine } from '../../lib/publishing/github';
 import { prepareThought } from '../../lib/publishing/prepare';
 import { purgeFeedCache } from '../../lib/feed-cache';
@@ -20,7 +24,7 @@ function json(body: unknown, status: number): Response {
 	});
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ cookies, request }) => {
 	const publishToken = process.env.PUBLISH_TOKEN ?? '';
 	const githubToken = process.env.GITHUB_TOKEN ?? '';
 
@@ -28,7 +32,16 @@ export const POST: APIRoute = async ({ request }) => {
 		return json({ error: 'Publishing is not configured.' }, 503);
 	}
 
-	if (!hasValidPublishToken(request.headers.get('Authorization'), publishToken)) {
+	const hasSession = hasValidPublishSession(
+		cookies.get(PUBLISH_SESSION_COOKIE)?.value,
+		publishToken,
+	);
+	const hasBearerToken = hasValidPublishToken(
+		request.headers.get('Authorization'),
+		publishToken,
+	);
+
+	if (!hasSession && !hasBearerToken) {
 		return json({ error: 'Unauthorized.' }, 401);
 	}
 

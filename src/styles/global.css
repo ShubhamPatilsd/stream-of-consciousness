@@ -215,7 +215,8 @@ main {
 	margin-block-start: 1.5rem;
 }
 
-.writer-actions button {
+.writer-actions button,
+.writer-signout button {
 	padding: 0;
 	border: 0;
 	background: none;
@@ -227,7 +228,8 @@ main {
 	cursor: pointer;
 }
 
-.writer-actions button:hover {
+.writer-actions button:hover,
+.writer-signout button:hover {
 	text-decoration-color: currentColor;
 }
 
@@ -246,6 +248,15 @@ main {
 	min-height: 1.5em; /* keeps the page from shifting when status text appears */
 	font-size: 0.8125rem;
 	line-height: 1.5;
+	color: #6b6b6b;
+}
+
+.writer-signout {
+	margin-block-start: 2rem;
+}
+
+.writer-signout button {
+	font-size: 0.8125rem;
 	color: #6b6b6b;
 }
 
