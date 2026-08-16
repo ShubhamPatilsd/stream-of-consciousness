@@ -1,14 +1,16 @@
 ---
 import type { ThoughtRecord } from '../lib/thought-record';
+import type { VoteCounts } from '../lib/votes';
 import Thought from './Thought.astro';
 
 interface Props {
 	thoughts: ThoughtRecord[];
+	votes: Map<string, VoteCounts>;
 	page: number;
 	pageCount: number;
 }
 
-const { thoughts, page, pageCount } = Astro.props;
+const { thoughts, votes, page, pageCount } = Astro.props;
 const newerHref = page === 2 ? '/' : `/page/${page - 1}/`;
 const olderHref = `/page/${page + 1}/`;
 ---
@@ -27,7 +29,7 @@ const olderHref = `/page/${page + 1}/`;
 </figure>
 
 <ol class="thought-list" aria-label="Thoughts">
-	{thoughts.map((thought) => <Thought thought={thought} />)}
+	{thoughts.map((thought) => <Thought thought={thought} votes={votes.get(thought.id)} />)}
 </ol>
 
 {
