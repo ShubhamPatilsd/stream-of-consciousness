@@ -7,6 +7,7 @@ import {
 	getSortedThoughts,
 	paginateThoughts,
 } from '../../lib/thoughts';
+import { getVoteCounts } from '../../lib/votes';
 
 export const prerender = false;
 
@@ -28,8 +29,9 @@ Astro.response.headers.set('Cache-Control', FEED_CACHE_CONTROL);
 await tagFeedResponse();
 
 const thoughts = paginateThoughts(allThoughts, page);
+const votes = await getVoteCounts();
 ---
 
 <BaseLayout title={`Page ${page} · Shubham's Thoughts`}>
-	<ThoughtFeed thoughts={thoughts} page={page} pageCount={pageCount} />
+	<ThoughtFeed thoughts={thoughts} votes={votes} page={page} pageCount={pageCount} />
 </BaseLayout>

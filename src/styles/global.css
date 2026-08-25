@@ -140,6 +140,29 @@ main {
 	font-variant-numeric: tabular-nums;
 }
 
+/* Votes: as quiet as the timestamp until hovered. */
+.vote-form {
+	display: flex;
+	gap: 0.5rem;
+	margin-block-start: 0.5rem;
+}
+
+.vote-form button {
+	appearance: none;
+	border: none;
+	background: none;
+	padding: 0;
+	font: inherit;
+	font-size: 0.8125rem;
+	color: #6b6b6b; /* 5.3:1 on white */
+	font-variant-numeric: tabular-nums;
+	cursor: pointer;
+}
+
+.vote-form button:hover {
+	color: inherit;
+}
+
 /* Pagination: quiet, but unmistakably clickable. */
 .pagination {
 	display: flex;
